@@ -648,6 +648,14 @@ class View(utils.SubjectMixin):
         # we don't want the text bind_class() handler for Ctrl-A to be fired.
         return "break"
 
+    def cmd_delete_previous_word(self, evt=None):
+        num_char_to_delete = 1
+        while self.text_note.get("insert - {} chars".format(num_char_to_delete)) in (" ", "\t"):
+            num_char_to_delete += 1
+
+        self.text_note.delete("insert - {} chars wordstart".format(num_char_to_delete), "insert")
+        return "break"
+
     def set_note_editing(self, enable=True):
         """Enable or disable note editing controls.
 
@@ -797,6 +805,7 @@ class View(utils.SubjectMixin):
         # <Key>
 
         self.text_note.bind("<Control-a>", self.cmd_select_all)
+        self.text_note.bind("<Control-BackSpace>", self.cmd_delete_previous_word)
 
         self.tags_entry.bind("<Return>", self.handler_add_tags_to_selected_note)
         self.tags_entry.bind("<Escape>", lambda e: self.text_note.focus())
