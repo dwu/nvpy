@@ -656,6 +656,17 @@ class View(utils.SubjectMixin):
         self.text_note.delete("insert - {} chars wordstart".format(num_char_to_delete), "insert")
         return "break"
 
+    def cmd_delete_line(self, evt=None):
+        if self.text_note.tag_ranges(tk.SEL):
+            if self.text_note.index("sel.last").split(".")[1] == "0":
+                # end of selection is at beginning of line
+                self.text_note.delete("sel.first linestart", "sel.last")
+            else:
+                self.text_note.delete("sel.first linestart", "sel.last +1 line linestart")
+        else:
+            self.text_note.delete("insert linestart", "insert +1 line linestart")
+        return "break"
+
     def set_note_editing(self, enable=True):
         """Enable or disable note editing controls.
 
@@ -806,6 +817,7 @@ class View(utils.SubjectMixin):
 
         self.text_note.bind("<Control-a>", self.cmd_select_all)
         self.text_note.bind("<Control-BackSpace>", self.cmd_delete_previous_word)
+        self.text_note.bind("<Control-d>", self.cmd_delete_line)
 
         self.tags_entry.bind("<Return>", self.handler_add_tags_to_selected_note)
         self.tags_entry.bind("<Escape>", lambda e: self.text_note.focus())
@@ -833,8 +845,8 @@ class View(utils.SubjectMixin):
         self.root.bind_all("<Control-n>", self.cmd_root_new)
 
         file_menu.add_command(label="Delete note", underline=0,
-                              command=self.cmd_root_delete, accelerator="Ctrl+D")
-        self.root.bind_all("<Control-d>", self.cmd_root_delete)
+                              command=self.cmd_root_delete, accelerator="Ctrl+Shift+D")
+        self.root.bind_all("<Control-D>", self.cmd_root_delete)
 
         file_menu.add_separator()
 
