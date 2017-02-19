@@ -960,7 +960,7 @@ class View(utils.SubjectMixin):
         icon_fn = 'nvpy.gif'
         iconpath = os.path.join(
             self.config.app_dir, 'icons', icon_fn)
-        
+
         self.icon = tk.PhotoImage(file=iconpath)
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
 
@@ -1487,9 +1487,9 @@ class View(utils.SubjectMixin):
             return True
 
         tags = note.get('tags', [])
-        
+
         # get list of string tags from ui
-        tag_elements = self.note_existing_tags_frame.children.values() 
+        tag_elements = self.note_existing_tags_frame.children.values()
         ui_tags = [element['text'].replace(' x', '') for element in tag_elements]
 
         if sorted(ui_tags) != sorted(tags):
@@ -1580,7 +1580,7 @@ class View(utils.SubjectMixin):
                     command=lambda tag=tag:
                     self.handler_delete_tag_from_selected_note(tag))
             tag_button.pack(side=tk.LEFT)
-        
+
             #self.tags_entry_var.set(','.join(tags))
             self.pinned_checkbutton_var.set(utils.note_pinned(note))
 
