@@ -7,5 +7,6 @@ See <https://github.com/cpbotha/nvpy> for original documentation.
 * Keybindings
 	* Delete current line or selection with `Control-d`; delete current note with `Control-Alt-d`
 	* Delete previous word with `Control-BackSpace`
+	* Change `Control-s` keybinding to trigger local file sync
 * Interface
 	* Increase startup window size

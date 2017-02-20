@@ -853,9 +853,11 @@ class View(utils.SubjectMixin):
         file_menu.add_command(label="Sync full", underline=5,
                               command=self.cmd_sync_full)
         file_menu.add_command(label="Sync current note",
-                underline=0, command=self.cmd_sync_current_note,
+                underline=0, command=self.cmd_sync_current_note)
+        file_menu.add_command(label="Sync local",
+                underline=0, command=self.cmd_sync_local,
                 accelerator="Ctrl+S")
-        self.root.bind_all("<Control-s>", self.cmd_sync_current_note)
+        self.root.bind_all("<Control-s>", self.cmd_sync_local)
 
         file_menu.add_separator()
 
@@ -1204,6 +1206,9 @@ class View(utils.SubjectMixin):
 
     def cmd_sync_current_note(self, event=None):
         self.notify_observers('command:sync_current_note', None)
+
+    def cmd_sync_local(self, event=None):
+        self.handler_housekeeper()
 
     def cmd_sync_full(self, event=None):
         self.notify_observers('command:sync_full', None)
