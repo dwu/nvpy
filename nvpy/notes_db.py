@@ -52,6 +52,7 @@ class NotesDB(utils.SubjectMixin):
         # create txt Notes dir if it does not exist
         if self.config.notes_as_txt and not os.path.exists(config.txt_path):
             os.mkdir(config.txt_path)
+            os.mkdir(os.path.join(config.txt_path, "Archive"))
 
         now = time.time()
         # now read all .json files from disk
@@ -183,6 +184,7 @@ class NotesDB(utils.SubjectMixin):
             'createdate': timestamp,
             'savedate': 0,  # never been written to disc
             'syncdate': 0,  # never been synced with server
+            'archived': 0,
             'tags': []
         }
 
@@ -192,6 +194,12 @@ class NotesDB(utils.SubjectMixin):
 
     def delete_note(self, key):
         n = self.notes[key]
+        n['deleted'] = 1
+        n['modifydate'] = time.time()
+
+    def archive_note(self, key):
+        n = self.notes[key]
+        n['archived'] = 1
         n['deleted'] = 1
         n['modifydate'] = time.time()
 
@@ -326,7 +334,7 @@ class NotesDB(utils.SubjectMixin):
         for k in self.notes:
             n = self.notes[k]
 
-            if not n.get('deleted'):
+            if not n.get('deleted') and not n.get('archived'):
                 active_notes += 1
                 c = n.get('content')
 
@@ -371,7 +379,7 @@ class NotesDB(utils.SubjectMixin):
         for k in self.notes:
             n = self.notes[k]
             # we don't do anything with deleted notes (yet)
-            if n.get('deleted'):
+            if n.get('deleted') or n.get('archived'):
                 continue
 
             active_notes += 1
@@ -478,7 +486,13 @@ class NotesDB(utils.SubjectMixin):
                     logging.error('NotesDB_save: Error writing %s: %s' % (fn, str(e)))
                     raise WriteError('Error writing note file')
 
-            elif t and note.get('deleted') and k in self.titlelist:
+            elif t and note.get('deleted') and note.get('archived') and k in self.titlelist:
+                dfn = os.path.join(self.config.txt_path, self.titlelist[k])
+                if os.path.isfile(dfn):
+                    logging.debug('Archiving note : %s' % (dfn, ))
+                    os.rename(dfn, os.path.join(self.config.txt_path, "Archive", str(note.get('modifydate')).replace(".", "-") + "_" + self.titlelist[k]))
+
+            elif t and note.get('deleted') and not note.get('archived') and k in self.titlelist:
                 dfn = os.path.join(self.config.txt_path, self.titlelist[k])
                 if os.path.isfile(dfn):
                     logging.debug('Delete file %s ' % (dfn, ))

@@ -276,6 +276,7 @@ class Controller:
         self.view.add_observer('click:notelink',
                 self.observer_view_click_notelink)
         self.view.add_observer('delete:note', self.observer_view_delete_note)
+        self.view.add_observer('archive:note', self.observer_view_archive_note)
         self.view.add_observer('select:note', self.observer_view_select_note)
         self.view.add_observer('change:entry', self.observer_view_change_entry)
         self.view.add_observer('change:text', self.observer_view_change_text)
@@ -387,6 +388,28 @@ class Controller:
 
         # finally delete the note
         self.notes_db.delete_note(key)
+
+        # easiest now is just to regenerate the list by resetting search string
+        # if the note after the deleted one is already selected, this will
+        # simply keep that selection!
+        self.view.set_search_entry_text(self.view.get_search_entry_text())
+
+    def observer_view_archive_note(self, view, evt_type, evt):
+        # archive note
+
+        # if these two are not equal, something is not kosher.
+        assert(evt.sel == self.selected_note_idx)
+
+        # first get key of note that is to be archived
+        key = self.get_selected_note_key()
+
+        # then try to select after the one that is to be deleted
+        nidx = evt.sel + 1
+        if nidx >= 0 and nidx < self.view.get_number_of_notes():
+            self.view.select_note(nidx)
+
+        # finally delete the note
+        self.notes_db.archive_note(key)
 
         # easiest now is just to regenerate the list by resetting search string
         # if the note after the deleted one is already selected, this will

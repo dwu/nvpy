@@ -637,6 +637,14 @@ class View(utils.SubjectMixin):
             sidx = self.notes_list.selected_idx
             self.notify_observers('delete:note', utils.KeyValueObject(sel=sidx))
 
+    def cmd_root_archive(self, evt=None):
+        # double-check that the user really means archive
+        if tkMessageBox.askyesno("Really archive note?",
+                                 "Are you sure you want to archive the current note?",
+                                 default=tkMessageBox.NO):
+            sidx = self.notes_list.selected_idx
+            self.notify_observers('archive:note', utils.KeyValueObject(sel=sidx))
+
     def cmd_root_new(self, evt=None):
         # this'll get caught by a controller event handler
         self.notify_observers('create:note', utils.KeyValueObject(title=self.get_search_entry_text()))
@@ -847,6 +855,10 @@ class View(utils.SubjectMixin):
         file_menu.add_command(label="Delete note", underline=0,
                               command=self.cmd_root_delete, accelerator="Ctrl+Shift+D")
         self.root.bind_all("<Control-D>", self.cmd_root_delete)
+
+        file_menu.add_command(label="Archive note", underline=0,
+                command=self.cmd_root_archive, accelerator="Ctrl+Shift+A")
+        self.root.bind_all("<Control-A>", self.cmd_root_archive)
 
         file_menu.add_separator()
 
