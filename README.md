@@ -9,6 +9,6 @@ See <https://github.com/cpbotha/nvpy> for original documentation.
 	* Delete previous word with `Control-BackSpace`
 	* Change `Control-s` keybinding to trigger local file sync
 * Interface
-	* Increase startup window size
+	* Configurable note text pane size (config file options `text_width` and `text_height`)
 * Features
 	* Experimental (!) quick and dirty note archiving implementation (`Control-Shift-a`). Note is moved to the `Archive` sub-folder of the note folder with a modifieddate prefix.

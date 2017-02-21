@@ -950,10 +950,6 @@ class View(utils.SubjectMixin):
 
     def _create_ui(self):
 
-        # these two variables determine the final dimensions of our interface
-        TEXT_HEIGHT = 45
-        TEXT_WIDTH = 140
-
         # set the correct class name. this helps your desktop environment
         # to identify the nvPY window.
         self.root = tk.Tk(className="nvPY")
@@ -1097,7 +1093,7 @@ class View(utils.SubjectMixin):
                             size=self.config.font_size)
             # tkFont.families(root) returns list of available font family names
             # this determines the width of the complete interface (yes)
-            text = RedirectedText(master, height=TEXT_HEIGHT, width=TEXT_WIDTH,
+            text = RedirectedText(master, height=self.config.text_height, width=self.config.text_width,
                                   wrap=tk.WORD,
                                   font=f, tabs=(4 * f.measure(0), 'left'), tabstyle='wordprocessor',
                                   yscrollcommand=yscrollbar.set,

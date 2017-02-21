@@ -100,6 +100,8 @@ class Config:
                     'sn_username': '',
                     'sn_password': '',
                     'simplenote_sync': '1',
+                    'text_width': '80',
+                    'text_height': '25',
                     'debug': '1',
                     # Filename or filepath to a css file used style the rendered
                     # output; e.g. nvpy.css or /path/to/my.css
@@ -165,6 +167,9 @@ class Config:
         self.print_columns = cp.getint(cfg_sec, 'print_columns')
 
         self.background_color = cp.get(cfg_sec, 'background_color')
+
+        self.text_width = cp.getint(cfg_sec, 'text_width')
+        self.text_height = cp.getint(cfg_sec, 'text_height')
 
         self.rest_css_path = cp.get(cfg_sec, 'rest_css_path')
         self.debug = cp.getint(cfg_sec, 'debug')
