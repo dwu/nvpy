@@ -1,13 +1,15 @@
 # nvPY
 
-See <https://github.com/cpbotha/nvpy> for original documentation.
+Fork of cpbotha's great note-taking application *nvpy* with a couple of tweaks to adapt it for my needs.
+
+See <https://github.com/cpbotha/nvpy> for the original documentation.
 
 ## Changes in this fork
 
 * Keybindings
 	* Delete current line or selection with `Control-d`; delete current note with `Control-Shift-d`
 	* Delete previous word with `Control-BackSpace`
-	* Change `Control-s` keybinding to trigger local file sync
+	* Change `Control-s` keybinding to trigger local file sync instantly
 * Interface
 	* Configurable note text pane size (config file options `text_width` and `text_height`)
 * Features
