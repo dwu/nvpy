@@ -675,6 +675,23 @@ class View(utils.SubjectMixin):
             self.text_note.delete("insert linestart", "insert +1 line linestart")
         return "break"
 
+    def cmd_toggle_checkbox(self, evt=None):
+        current_cursor = self.text_note.index("insert")
+        current_line = self.text_note.get("insert linestart", "insert lineend")
+
+        if "[ ]" in current_line:
+            new_line = current_line.replace("[ ]", "[x]")
+        elif "[x]" in current_line:
+            new_line = current_line.replace("[x]", "[ ]")
+
+        self.text_note.mark_set("replace", "insert linestart")
+        self.text_note.delete("insert linestart", "insert lineend")
+        self.text_note.insert("replace", new_line)
+        self.text_note.mark_unset("replace")
+
+        self.text_note.mark_set("insert", current_cursor)
+        return "break"
+
     def set_note_editing(self, enable=True):
         """Enable or disable note editing controls.
 
@@ -826,6 +843,7 @@ class View(utils.SubjectMixin):
         self.text_note.bind("<Control-a>", self.cmd_select_all)
         self.text_note.bind("<Control-BackSpace>", self.cmd_delete_previous_word)
         self.text_note.bind("<Control-d>", self.cmd_delete_line)
+        self.text_note.bind("<Alt-c>", self.cmd_toggle_checkbox)
 
         self.tags_entry.bind("<Return>", self.handler_add_tags_to_selected_note)
         self.tags_entry.bind("<Escape>", lambda e: self.text_note.focus())
@@ -931,6 +949,10 @@ class View(utils.SubjectMixin):
 
         tools_menu.add_command(label="Word Count",
             underline=0, command=self.word_count)
+
+        tools_menu.add_command(label="Toggle Checkbox",
+            underline=0, command=self.cmd_toggle_checkbox,
+            accelerator="Alt+c")
 
         # the internet thinks that multiple modifiers should work, but this didn't
         # want to.
