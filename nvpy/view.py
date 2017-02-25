@@ -675,21 +675,100 @@ class View(utils.SubjectMixin):
             self.text_note.delete("insert linestart", "insert +1 line linestart")
         return "break"
 
-    def cmd_toggle_checkbox(self, evt=None):
+    def filter_lines(self, func):
+        had_selection = False
         current_cursor = self.text_note.index("insert")
-        current_line = self.text_note.get("insert linestart", "insert lineend")
+        if self.text_note.tag_ranges(tk.SEL):
+            had_selection = True
+            sel_first = self.text_note.index("sel.first linestart")
+            if self.text_note.index("sel.last").split(".")[1] == "0":
+                sel_last = self.text_note.index("sel.last -1 line lineend")
+            else:
+                sel_last = self.text_note.index("sel.last lineend")
+        else:
+            sel_first = self.text_note.index("insert linestart")
+            sel_last = self.text_note.index("insert lineend")
+        for l in range(int(sel_first.split(".")[0]), int(sel_last.split(".")[0]) + 1):
+            line = self.text_note.get(str(l) + ".0", str(l) + ".end")
+            self.text_note.delete(str(l) + ".0", str(l) + ".end")
+            self.text_note.insert(str(l) + ".0", func(line))
 
-        if "[ ]" in current_line:
-            new_line = current_line.replace("[ ]", "[x]")
-        elif "[x]" in current_line:
-            new_line = current_line.replace("[x]", "[ ]")
-
-        self.text_note.mark_set("replace", "insert linestart")
-        self.text_note.delete("insert linestart", "insert lineend")
-        self.text_note.insert("replace", new_line)
-        self.text_note.mark_unset("replace")
+        if had_selection:
+            self.text_note.tag_add("sel", sel_first, sel_last)
 
         self.text_note.mark_set("insert", current_cursor)
+
+    def filter_toggle_checkbox(self, line):
+        if "[ ]" in line:
+            return line.replace("[ ]", "[x]")
+        elif "[x]" in line:
+            return line.replace("[x]", "[ ]")
+        else:
+            return line
+
+    def filter_indent(self, line):
+        return "\t" + line
+
+    def filter_deindent(self, line):
+        return re.sub("^\t", "", line, 1)
+
+    def cmd_toggle_checkbox(self, evt=None):
+        self.filter_lines(self.filter_toggle_checkbox)
+        return "break"
+
+    def cmd_indent(self, evt=None):
+        self.filter_lines(self.filter_indent)
+        return "break"
+
+    def cmd_deindent(self, evt=None):
+        self.filter_lines(self.filter_deindent)
+        return "break"
+
+    def move(self, direction):
+        had_selection = None
+        current_cursor = self.text_note.index("insert")
+        if self.text_note.tag_ranges(tk.SEL):
+            had_selection = True
+            sel_first = self.text_note.index("sel.first linestart")
+            if self.text_note.index("sel.last").split(".")[1] == "0":
+                sel_last = self.text_note.index("sel.last -1 line lineend")
+            else:
+                sel_last = self.text_note.index("sel.last lineend")
+        else:
+            sel_first = self.text_note.index("insert linestart")
+            sel_last = self.text_note.index("insert lineend")
+
+        if sel_first.split(".")[0] == "1" or sel_last.split(".")[0] == self.text_note.index("end"):
+            return
+
+        selected_text = self.text_note.get(sel_first, sel_last)
+        if direction == "up":
+            prev_line_text = self.text_note.get(sel_first + " -1 line linestart", sel_first + " -1 line lineend")
+            self.text_note.delete(sel_first + " -1 line linestart", sel_last)
+            self.text_note.insert(sel_first + " -1 line linestart", selected_text + "\n" + prev_line_text)
+
+            if had_selection:
+                self.text_note.tag_remove("sel", "1.0", "end")
+                self.text_note.tag_add("sel", sel_first + " -1 line linestart", sel_last + " -1 line lineend")
+
+            self.text_note.mark_set("insert", sel_first + " -1 line linestart")
+        elif direction == "down":
+            next_line_text = self.text_note.get(sel_last + " +1 line linestart", sel_last + " +1 line lineend")
+            self.text_note.delete(sel_first, sel_last + " +1 line lineend")
+            self.text_note.insert(sel_first, next_line_text + "\n" + selected_text)
+
+            if had_selection:
+                self.text_note.tag_remove("sel", "1.0", "end")
+                self.text_note.tag_add("sel", sel_first + " +1 line linestart", sel_last + " +1 line lineend")
+
+            self.text_note.mark_set("insert", sel_first + " +1 line linestart")
+
+    def cmd_moveup(self, evt=None):
+        self.move("up")
+        return "break"
+
+    def cmd_movedown(self, evt=None):
+        self.move("down")
         return "break"
 
     def set_note_editing(self, enable=True):
@@ -844,6 +923,10 @@ class View(utils.SubjectMixin):
         self.text_note.bind("<Control-BackSpace>", self.cmd_delete_previous_word)
         self.text_note.bind("<Control-d>", self.cmd_delete_line)
         self.text_note.bind("<Alt-c>", self.cmd_toggle_checkbox)
+        self.text_note.bind("<Alt-Right>", self.cmd_indent)
+        self.text_note.bind("<Alt-Left>", self.cmd_deindent)
+        self.text_note.bind("<Alt-Up>", self.cmd_moveup)
+        self.text_note.bind("<Alt-Down>", self.cmd_movedown)
 
         self.tags_entry.bind("<Return>", self.handler_add_tags_to_selected_note)
         self.tags_entry.bind("<Escape>", lambda e: self.text_note.focus())

@@ -14,4 +14,6 @@ See <https://github.com/cpbotha/nvpy> for the original documentation.
 	* Delete current line or selection with `Control-d`; delete current note with `Control-Shift-d`
 	* Delete previous word with `Control-BackSpace`
 	* Experimental (!) quick and dirty note archiving implementation (`Control-Shift-a`). Note is moved to the `Archive` sub-folder of the note folder with a modifieddate prefix.
-	* Toggle checkbox (`[ ]`/`[x]`) in current line with `Alt-c`
+	* Toggle checkbox (`[ ]`/`[x]`) in current line / selected lines with `Alt-c`
+	* Indent/deindent current line / selected lines with `Alt-Right` and `Alt-Left`
+	* Move current line / selected lines up / down with `Alt-Up` and `Alt-Down`
