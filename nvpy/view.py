@@ -738,11 +738,11 @@ class View(utils.SubjectMixin):
             sel_first = self.text_note.index("insert linestart")
             sel_last = self.text_note.index("insert lineend")
 
-        if sel_first.split(".")[0] == "1" or sel_last.split(".")[0] == self.text_note.index("end"):
-            return
-
         selected_text = self.text_note.get(sel_first, sel_last)
         if direction == "up":
+            if sel_first.split(".")[0] == "2":
+                return
+
             prev_line_text = self.text_note.get(sel_first + " -1 line linestart", sel_first + " -1 line lineend")
             self.text_note.delete(sel_first + " -1 line linestart", sel_last)
             self.text_note.insert(sel_first + " -1 line linestart", selected_text + "\n" + prev_line_text)
@@ -753,6 +753,9 @@ class View(utils.SubjectMixin):
 
             self.text_note.mark_set("insert", sel_first + " -1 line linestart")
         elif direction == "down":
+            if sel_last.split(".")[0] == self.text_note.index("end"):
+                return
+
             next_line_text = self.text_note.get(sel_last + " +1 line linestart", sel_last + " +1 line lineend")
             self.text_note.delete(sel_first, sel_last + " +1 line lineend")
             self.text_note.insert(sel_first, next_line_text + "\n" + selected_text)
